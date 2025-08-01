@@ -17,9 +17,7 @@ app.get("/", (req, res) => {
 });
 
 mongoose
-  .connect(
-    "mongodb+srv://admin:Luke10506@backenddb.zqqwr.mongodb.net/CRUD-API-project?retryWrites=true&w=majority&appName=BackendDB"
-  )
+  .connect("mongodb+srv://admin:10506@cluster0.a9o19.mongodb.net/")
   .then(() => {
     console.log("Connected to MongoDB!");
     app.listen(3000, () => {
