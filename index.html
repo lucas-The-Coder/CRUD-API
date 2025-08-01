@@ -1,93 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Product CRUD App</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-      h1 {
-        color: #333;
-      }
-      input,
-      button {
-        margin: 5px;
-        padding: 8px;
-      }
-      ul {
-        list-style: none;
-        padding: 0;
-      }
-      li {
-        padding: 6px;
-        border-bottom: 1px solid #ddd;
-      }
-      .product {
-        display: flex;
-        justify-content: space-between;
-      }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #product-list {
+            margin-top: 20px;
+        }
+        .product {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
     </style>
-  </head>
-  <body>
-    <h1>Products</h1>
-
-    <form id="productForm">
-      <input type="text" id="name" placeholder="Product name" required />
-      <input type="number" id="price" placeholder="Price" required />
-      <button type="submit">Add Product</button>
+</head>
+<body>
+    <h1>Product List</h1>
+    <form id="add-product-form">
+        <label for="product-name">Product Name:</label>
+        <input type="text" id="product-name" name="name"><br><br>
+        <label for="product-quantity">Quantity:</label>
+        <input type="number" id="product-quantity" name="quantity"><br><br>
+        <button type="submit">Add Product</button>
     </form>
-
-    <ul id="productList"></ul>
+    <div id="product-list"></div>
 
     <script>
-      const API_URL = "http://localhost:3000"; 
+        const form = document.getElementById('add-product-form');
+        const productList = document.getElementById('product-list');
 
-      const productList = document.getElementById("productList");
-      const form = document.getElementById("productForm");
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const productName = document.getElementById('product-name').value;
+            const productQuantity = document.getElementById('product-quantity').value;
 
-      // Fetch products
-      async function fetchProducts() {
-        const res = await fetch(API_URL);
-        const products = await res.json();
-        productList.innerHTML = "";
-        products.forEach((p) => {
-          const li = document.createElement("li");
-          li.innerHTML = `
-          <div class="product">
-            <span>${p.name} - $${p.price}</span>
-            <button onclick="deleteProduct('${p._id}')">Delete</button>
-          </div>
-        `;
-          productList.appendChild(li);
-        });
-      }
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: productName, quantity: productQuantity }),
+            });
 
-      // Add a product
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const name = document.getElementById("name").value;
-        const price = document.getElementById("price").value;
+            const data = await response.json();
+            console.log(data);
 
-        await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, price }),
+            // Display the updated product list
+            productList.innerHTML = '';
+            data.products.forEach((product) => {
+                const productHTML = `
+                    <div class="product">
+                        <h2>${product.name}</h2>
+                        <p>Quantity: ${product.quantity}</p>
+                    </div>
+                `;
+                productList.innerHTML += productHTML;
+            });
         });
 
-        form.reset();
-        fetchProducts();
-      });
-
-      // Delete a product
-      async function deleteProduct(id) {
-        await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-        fetchProducts();
-      }
-
-      // Initial load
-      fetchProducts();
+        // Load the product list on page load
+        fetch('/api/products')
+            .then((response) => response.json())
+            .then((data) => {
+                const products = data.products;
+                products.forEach((product) => {
+                    const productHTML = `
+                        <div class="product">
+                            <h2>${product.name}</h2>
+                            <p>Quantity: ${product.quantity}</p>
+                        </div>
+                    `;
+                    productList.innerHTML += productHTML;
+                });
+            })
+            .catch((error) => console.error(error));
     </script>
-  </body>
+</body>
 </html>

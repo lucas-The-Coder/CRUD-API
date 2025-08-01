@@ -3,7 +3,7 @@ import product from "../models/product.model.js";
 const getProducts = async (req, res) => {
   try {
     const products = await product.find({});
-    res.status(200).json(products);
+    res.status(200).json({ products });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -22,7 +22,12 @@ const getSingleProduct = async (req, res) => {
 const createProduct = async (req, res) => {
   try {
     const productData = await product.create(req.body);
-    res.status(200).json(productData);
+    res
+      .status(201)
+      .json({
+        message: "Product created successfully",
+        products: await product.find({}),
+      });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
