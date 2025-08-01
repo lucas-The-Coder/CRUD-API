@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CRUD API</title>
+  </head>
+  <body>
+    <h1>Products</h1>
+    <button id="loadData">Load Data</button>
+    <ul id="dataList"></ul>
+
+    <script>
+      const apiUrl = "http://localhost:3000";
+
+      document
+        .getElementById("loadData")
+        .addEventListener("click", async () => {
+          try {
+            const res = await fetch(apiUrl);
+            const data = await res.json();
+
+            const list = document.getElementById("dataList");
+            list.innerHTML = "";
+            data.forEach((item) => {
+              const li = document.createElement("li");
+              li.textContent = item.name;
+              li.textContent = item.price;
+              li.textContent = item.quantity;
+              list.appendChild(li);
+            });
+          } catch (err) {
+            console.error("Error fetching data:", err);
+          }
+        });
+    </script>
+  </body>
+</html>
